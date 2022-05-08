@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.18)
 project(c-libs)
 
-set(C_STANDARD 23)
+set(C_STANDARD 17)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include_directories(
@@ -12,6 +12,8 @@ add_executable(c-libs
         src/main.c
         src/Array.c
         src/GenericAllocator.c
+        src/Rasterizer.c
+        src/Color.c
 )
 
 if (WIN32)
@@ -25,9 +27,6 @@ if (WIN32)
                 winmm.lib
                 opengl32
                 gdi32
-
-                utility_libs
-                fmt
         )
 else ()
         target_link_libraries(c-libs

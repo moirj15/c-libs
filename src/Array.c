@@ -3,6 +3,7 @@
 #include "GenericAllocator.h"
 
 #include <string.h>
+#include <assert.h>
 
 typedef struct {
     u64 element_size;
@@ -10,12 +11,12 @@ typedef struct {
     u64 size;
 } DynamicArrayHeader;
 
-DynamicArrayHeader *_DynamicArray_GetHeader(void *array)
+DynamicArrayHeader *_DynamicArray_GetHeader(u8 *array)
 {
     return ((DynamicArrayHeader *)(array - sizeof(DynamicArrayHeader)));
 }
 
-void *_DynamicArray_Init(u64 element_size, u64 initial_capacity)
+u8 *_DynamicArray_init(u64 element_size, u64 initial_capacity)
 {
     const u64 total_size = sizeof(DynamicArrayHeader) + (element_size * initial_capacity);
     DynamicArrayHeader *data = (DynamicArrayHeader *)GenericAllocator_Malloc(total_size);
@@ -23,35 +24,42 @@ void *_DynamicArray_Init(u64 element_size, u64 initial_capacity)
     data->element_size = element_size;
     data->capacity = initial_capacity;
 
-    return ((void *)data) + sizeof(DynamicArrayHeader);
+    return ((u8 *)data) + sizeof(DynamicArrayHeader);
 }
 
-void DynamicArray_GrowIfNeeded(void **array)
+u8 *_DynamicArray_init_with_size(u64 element_size, u64 size)
 {
-    DynamicArrayHeader *data = (*array) - sizeof(DynamicArrayHeader);
+    u8 *array = _DynamicArray_init(element_size, size);
+    _DynamicArray_GetHeader(array)->size = size;
+    return array;
+}
+
+void DynamicArray_grow_if_needed(u8 **array)
+{
+    DynamicArrayHeader *data = (DynamicArrayHeader *)((*array) - sizeof(DynamicArrayHeader));
     if (data->capacity < (data->size + 1)) {
         data->capacity += 32;
         GenericAllocator_Realloc(&data, sizeof(DynamicArrayHeader) + (data->element_size * data->capacity));
-        *array = (void *)data + sizeof(DynamicArrayHeader);
+        *array = (u8 *)data + sizeof(DynamicArrayHeader);
     }
 }
 
-u64 DynamicArray_Size(void *array)
+u64 _DynamicArray_size(u8 *array)
 {
     return _DynamicArray_GetHeader(array)->size;
 }
 
-u64 DynamicArray_Capacity(void *array)
+u64 DynamicArray_capacity(u8 *array)
 {
     return _DynamicArray_GetHeader(array)->capacity;
 }
 
-void _DynamicArray_IncrementSize(void *array)
+void _DynamicArray_increment_size(u8 *array)
 {
     _DynamicArray_GetHeader(array)->size++;
 }
 
-void DynamicArray_Destroy(void *array)
+void DynamicArray_destroy(void *array)
 {
     GenericAllocator_Free(_DynamicArray_GetHeader(array));
 }
