@@ -14,6 +14,7 @@ add_executable(c-libs
         src/GenericAllocator.c
         src/Rasterizer.c
         src/Color.c
+		src/String.c
 )
 
 if (WIN32)
