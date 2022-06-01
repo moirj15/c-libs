@@ -2,8 +2,8 @@
 #include "GenericAllocator.h"
 #include "Rasterizer.h"
 
-#include <stdio.h>
 #include <SDL2/SDL.h>
+#include <stdio.h>
 
 int main(int argc, char **argv)
 {
@@ -17,10 +17,8 @@ int main(int argc, char **argv)
                 return 0;
             }
         }
-        Rasterizer_clear_screen(rasterizer, (Color){1.0f, 0.0f, 0.0f, 1.0f});
+        Rasterizer_clear_screen(rasterizer, (Color){.values = {1.0f, 0.0f, 0.0f, 1.0f}});
         Rasterizer_swap_buffers(rasterizer);
         Rasterizer_present(rasterizer);
     }
-
-//    return 0;
 }
